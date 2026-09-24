@@ -1,0 +1,210 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ CUR_LANG }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Visa Centrum XBA{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="{% url 'home' %}" class="logo">
+      <div class="logo-mark"><img src="{% static 'core/img/logo.png' %}" alt="Centrum XBA"></div>
+      Visa Centrum <span style="color:var(--blue-light)">XBA</span>
+    </a>
+    <div class="nav-center">
+      <nav class="links">
+        <a href="{% url 'home' %}">{{ T.nav_home }}</a>
+        <a href="{% url 'home' %}#about">{{ T.nav_about }}</a>
+        <a href="{% url 'home' %}#services">{{ T.nav_services }}</a>
+        <a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a>
+        <a href="{% url 'home' %}#contact">{{ T.nav_contact }}</a>
+      </nav>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button type="button" class="lang-current" id="lang-toggle" aria-haspopup="true" aria-expanded="false">
+          <span>{{ CUR_LANG|upper }}</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <form action="{% url 'set_language' %}" method="post" class="lang-menu" id="lang-menu">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ LANG_NEUTRAL_PATH }}">
+          {% for lang in LANGUAGES_LIST %}
+            <button type="submit" name="language" value="{{ lang.code }}"{% if lang.code == CUR_LANG %} class="active"{% endif %}>{{ lang.label }}</button>
+          {% endfor %}
+        </form>
+      </div>
+      <a href="{% url 'home' %}#contact" class="nav-cta">{{ T.header_cta }}</a>
+      <button type="button" class="burger" id="menu-toggle" aria-label="Menyu" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-inner">
+      <nav class="mobile-links">
+        <a href="{% url 'home' %}">{{ T.nav_home }}</a>
+        <a href="{% url 'home' %}#about">{{ T.nav_about }}</a>
+        <a href="{% url 'home' %}#services">{{ T.nav_services }}</a>
+        <a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a>
+        <a href="{% url 'home' %}#contact">{{ T.nav_contact }}</a>
+      </nav>
+      <a href="{% url 'home' %}#contact" class="btn btn-primary mobile-cta">{{ T.header_cta }}</a>
+    </div>
+  </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="logo-mark"><img src="{% static 'core/img/logo.png' %}" alt="Centrum XBA"></div>
+          Visa Centrum XBA
+        </div>
+        <p style="max-width:280px;opacity:.85;">{{ T.footer_desc }}</p>
+        <div class="socials">
+          <a href="#" aria-label="Facebook">f</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+          <a href="#" aria-label="Twitter">x</a>
+          <a href="#" aria-label="VK">vk</a>
+        </div>
+      </div>
+      <div>
+        <h5>{{ T.footer_nav_title }}</h5>
+        <ul>
+          <li><a href="{% url 'home' %}">{{ T.nav_home }}</a></li>
+          <li><a href="{% url 'home' %}#about">{{ T.nav_about }}</a></li>
+          <li><a href="{% url 'home' %}#services">{{ T.nav_services }}</a></li>
+          <li><a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>{{ T.footer_services_title }}</h5>
+        <ul>
+          <li><a href="{% url 'home' %}#services">{{ T.service1_title }}</a></li>
+          <li><a href="{% url 'home' %}#services">{{ T.service2_title }}</a></li>
+          <li><a href="{% url 'home' %}#services">{{ T.service3_title }}</a></li>
+          <li><a href="{% url 'home' %}#services">{{ T.service4_title }}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>{{ T.footer_contact_title }}</h5>
+        <ul>
+          <li><a href="{% url 'home' %}#contact">{{ T.footer_contact_link1 }}</a></li>
+          <li><a href="#">{{ T.footer_contact_link2 }}</a></li>
+          <li><a href="#">{{ T.footer_contact_link3 }}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>{{ T.footer_rights }}</span>
+      <span>{{ T.footer_design }}</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.services-grid, .process-grid, .vac-list').forEach(function(group){
+    Array.from(group.children).forEach(function(child, i){
+      child.style.transitionDelay = (i * 0.09) + 's';
+    });
+  });
+
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.15, rootMargin:'0px 0px -60px 0px'});
+
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+
+  var heroCard = document.querySelector('.hero-card');
+  var heroSection = document.querySelector('.hero');
+  if(heroCard && heroSection && window.matchMedia('(hover:hover)').matches){
+    var heroRect = null;
+    var pendingX = 0, pendingY = 0, rafId = null;
+
+    function applyTilt(){
+      rafId = null;
+      if(!heroRect) heroRect = heroSection.getBoundingClientRect();
+      var x = (pendingX - heroRect.left) / heroRect.width - 0.5;
+      var y = (pendingY - heroRect.top) / heroRect.height - 0.5;
+      heroCard.style.transform = 'perspective(800px) rotateY(' + (x*4) + 'deg) rotateX(' + (-y*4) + 'deg)';
+    }
+
+    heroSection.addEventListener('mousemove', function(e){
+      heroCard.style.transition = 'none';
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+      if(rafId === null){
+        rafId = requestAnimationFrame(applyTilt);
+      }
+    });
+    heroSection.addEventListener('mouseenter', function(){
+      heroRect = null;
+    });
+    heroSection.addEventListener('mouseleave', function(){
+      if(rafId !== null){ cancelAnimationFrame(rafId); rafId = null; }
+      heroCard.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
+      heroCard.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
+  var langToggle = document.getElementById('lang-toggle');
+  var langMenu = document.getElementById('lang-menu');
+  if(langToggle && langMenu){
+    function closeLangMenu(){
+      langMenu.classList.remove('open');
+      langToggle.setAttribute('aria-expanded', 'false');
+    }
+    langToggle.addEventListener('click', function(e){
+      e.stopPropagation();
+      var isOpen = langMenu.classList.toggle('open');
+      langToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', function(e){
+      if(!langMenu.contains(e.target) && e.target !== langToggle) closeLangMenu();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') closeLangMenu();
+    });
+  }
+
+  var menuToggle = document.getElementById('menu-toggle');
+  var mobileMenu = document.getElementById('mobile-menu');
+  if(menuToggle && mobileMenu){
+    menuToggle.addEventListener('click', function(){
+      var isOpen = mobileMenu.classList.toggle('open');
+      menuToggle.classList.toggle('open', isOpen);
+      menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    mobileMenu.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        mobileMenu.classList.remove('open');
+        menuToggle.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  var header = document.querySelector('header');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 12){
+      header.style.boxShadow = '0 8px 24px -12px rgba(0,0,0,.35)';
+    } else {
+      header.style.boxShadow = 'none';
+    }
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

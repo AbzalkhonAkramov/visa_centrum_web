@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ vacancy.title }} - Visa Centrum XBA{% endblock %}
+
+{% block content %}
+<section style="padding-top:44px;padding-bottom:0;">
+  <div class="wrap">
+    <a href="{% url 'vacancy_list' %}" class="vac-back">&larr; {{ T.vacancy_detail_back }}</a>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="vac-detail reveal">
+      <div class="vac-detail-head">
+        <div>
+          <span class="meta">{{ vacancy.location }}</span>
+          <h1>{{ vacancy.title }}</h1>
+        </div>
+        <span class="vac-tag">{{ vacancy.slots_label }}</span>
+      </div>
+      <div class="vac-detail-body">{{ vacancy.description }}</div>
+    </div>
+    <div style="margin-top:28px;">
+      <a href="{% url 'home' %}#contact" class="btn btn-primary">{{ T.vacancy_detail_apply }} &rarr;</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

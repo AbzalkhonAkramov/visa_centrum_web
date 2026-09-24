@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Visa Centrum XBA{% if CUR_LANG != "uz" %} - {{ T.hero_title_em }}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+  <span class="blob blob-a"></span>
+  <span class="blob blob-b"></span>
+  <span class="blob blob-c"></span>
+  <span class="blob blob-d"></span>
+  <span class="blob blob-e"></span>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="flag-badge">{{ T.hero_badge }}</div>
+      <h1>{{ T.hero_title_pre }}<em>{{ T.hero_title_em }}</em>{{ T.hero_title_post }}</h1>
+      <p class="lead">{{ T.hero_lead }}</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">{{ T.hero_cta_primary }} &rarr;</a>
+        <a href="{% url 'vacancy_list' %}" class="btn btn-white">{{ T.hero_vacancies_link }} &rarr;</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>{{ T.hero_stat1_num }}</b><span>{{ T.hero_stat1_label }}</span></div>
+        <div class="stat"><b>{{ T.hero_stat2_num }}</b><span>{{ T.hero_stat2_label }}</span></div>
+        <div class="stat"><b>{{ T.hero_stat3_num }}</b><span>{{ T.hero_stat3_label }}</span></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>{{ T.hero_card_title }}</h3>
+      <div class="big">{{ T.hero_card_big }}</div>
+      <div class="step-list">
+        <div class="step-row"><div class="step-num">1</div><span>{{ T.step1 }}</span></div>
+        <div class="step-row"><div class="step-num">2</div><span>{{ T.step2 }}</span></div>
+        <div class="step-row"><div class="step-num">3</div><span>{{ T.step3 }}</span></div>
+        <div class="step-row"><div class="step-num">4</div><span>{{ T.step4 }}</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">{{ T.services_kicker }}</div>
+      <h2>{{ T.services_title }}</h2>
+      <p>{{ T.services_lead }}</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>{{ T.service1_title }}</h3>
+        <p>{{ T.service1_desc }}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 20V10l8-6 8 6v10" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20v-6h6v6" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>{{ T.service2_title }}</h3>
+        <p>{{ T.service2_desc }}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h6M9 17h6" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>{{ T.service3_title }}</h3>
+        <p>{{ T.service3_desc }}</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21c4.97-3.5 8-7.13 8-11.2A6.8 6.8 0 0 0 12 3a6.8 6.8 0 0 0-8 6.8C4 13.87 7.03 17.5 12 21Z" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <h3>{{ T.service4_title }}</h3>
+        <p>{{ T.service4_desc }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-visual reveal">
+      <img src="{% static 'core/img/hoff-logo.png' %}" alt="HOFF Consulting" class="about-logo">
+      <div class="badge">
+        <div>
+          <b>{{ T.about_badge_title }}</b>
+          <span>{{ T.about_badge_sub }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="about-copy reveal">
+      <div class="kicker">{{ T.about_kicker }}</div>
+      <h2>{{ T.about_title }}</h2>
+      <p>{{ T.about_p }}</p>
+      <div class="check-list">
+        <div class="check-item"><i>&check;</i>{{ T.about_check1 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check2 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check3 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check4 }}</div>
+      </div>
+      <a href="#contact" class="btn btn-primary btn-dark">{{ T.about_cta }} &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<section class="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">{{ T.process_kicker }}</div>
+      <h2>{{ T.process_title }}</h2>
+      <p>{{ T.process_lead }}</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-card reveal"><div class="pnum">01</div><h3>{{ T.process1_title }}</h3><p>{{ T.process1_desc }}</p></div>
+      <div class="process-card reveal"><div class="pnum">02</div><h3>{{ T.process2_title }}</h3><p>{{ T.process2_desc }}</p></div>
+      <div class="process-card reveal"><div class="pnum">03</div><h3>{{ T.process3_title }}</h3><p>{{ T.process3_desc }}</p></div>
+      <div class="process-card reveal"><div class="pnum">04</div><h3>{{ T.process4_title }}</h3><p>{{ T.process4_desc }}</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">{{ T.nav_contact }}</div>
+      <h2>{{ T.cta_title }}</h2>
+      <p>{{ T.cta_lead }}</p>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_address_label }}</h4>
+            <p>Xurmontepa 27, Toshkent, O'zbekiston</p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5c0-1 1-2 2-2h2l2 5-2 1c1 2.5 3 4.5 5.5 5.5l1-2 5 2v2c0 1-1 2-2 2C10.7 20.5 3.5 13.3 4 5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_phone_label }}</h4>
+            <p><a href="tel:+998783339797">+998 78 333 97 97</a></p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_email_label }}</h4>
+            <p><a href="mailto:visa.centrum.uz@gmail.com">visa.centrum.uz@gmail.com</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-card">
+        {% if sent %}
+        <div class="contact-success">
+          <div class="contact-success-icon">&check;</div>
+          <h3>{{ T.contact_success_title }}</h3>
+          <p>{{ T.contact_success_text }}</p>
+        </div>
+        {% else %}
+        <form method="post" class="contact-form">
+          {% csrf_token %}
+          <div class="form-row">
+            <label for="id_full_name">{{ T.contact_field_name }}</label>
+            {{ form.full_name }}
+          </div>
+          <div class="form-row">
+            <label for="id_email">{{ T.contact_field_email }}</label>
+            {{ form.email }}
+          </div>
+          <div class="form-row">
+            <label for="id_phone">{{ T.contact_field_phone }}</label>
+            {{ form.phone }}
+          </div>
+          <div class="form-row">
+            <label for="id_message">{{ T.contact_field_message }}</label>
+            {{ form.message }}
+          </div>
+          <button type="submit" class="btn btn-primary">{{ T.contact_submit }} &rarr;</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

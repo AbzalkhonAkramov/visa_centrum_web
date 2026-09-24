@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ T.vacancies_title }} - Visa Centrum XBA{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="wrap">
+    <div class="kicker">{{ T.vacancies_kicker }}</div>
+    <h1>{{ T.vacancies_title }}</h1>
+    <p>{{ T.vacancies_lead }}</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    {% if vacancies %}
+    <div class="vac-list">
+      {% for v in vacancies %}
+      <div class="vac-item reveal">
+        <div class="vac-left">
+          <div class="vac-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <div>
+            <h4>{{ v.title }}</h4>
+            {% if v.location %}<span class="meta">{{ v.location }}</span>{% endif %}
+          </div>
+        </div>
+        <span class="vac-tag">{{ v.slots_label }}</span>
+        <a href="{% url 'vacancy_detail' v.slug %}" class="vac-link">{{ T.vacancy_detail_link }} &rarr;</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="vac-empty">{{ T.vacancies_empty }}</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
