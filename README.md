@@ -56,6 +56,35 @@ Ochiladigan manzillar:
 
 Serverni to'xtatish uchun terminalda `Ctrl+C` bosing.
 
+## Docker orqali ishga tushirish
+
+Docker Desktop o'rnatilgan bo'lsa, loyiha ildiz katalogida quyidagilarni
+ishlating:
+
+```bash
+cd ~/visa-centrum-web
+docker compose up --build
+```
+
+Docker konteyneri migratsiyalarni avtomatik qo'llaydi va saytni
+`http://127.0.0.1:8001` manzilida ishga tushiradi. Admin panel:
+`http://127.0.0.1:8001/admin/`.
+
+Admin foydalanuvchisi yaratish uchun boshqa terminalda:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+Konteynerni to'xtatish:
+
+```bash
+docker compose down
+```
+
+SQLite ma'lumotlar bazasi `./db.sqlite3` orqali konteynerdan tashqarida
+saqlanadi, shuning uchun konteyner qayta yaratilganda ma'lumotlar yo'qolmaydi.
+
 ## Loyiha tuzilishi
 
 ```

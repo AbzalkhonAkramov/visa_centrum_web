@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "8001:8001"
+    environment:
+      DJANGO_DEBUG: "true"
+      DJANGO_SECRET_KEY: "docker-development-only-change-me"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0,*"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "*"
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
+    restart: unless-stopped
