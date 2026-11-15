@@ -103,6 +103,41 @@ TRANSLATIONS = {
         "footer_contact_link3": "Hamkorlar",
         "footer_rights": "© 2026 Visa Centrum XBA. Barcha huquqlar himoyalangan.",
         "footer_design": "Dizayn: konsept namuna",
+        "seo_title": "Germaniyaga ishga ketish | Germaniya ish vizasi — Visa Centrum XBA",
+        "seo_description": "Germaniyaga ishga ketish, ish vizasi va Ausbildung bo'yicha rasmiy xususiy "
+                            "bandlik agentligi — Toshkentda. Hujjatlar, ish topish va bepul konsultatsiya — bir joyda.",
+        "seo_keywords": "Germaniyaga ishga ketish, Germaniyada ish, Germaniyaga ish vizasi, "
+                         "Germaniyaga legal ketish, Germaniyada ish topish, Germaniyaga ishchi kerak, "
+                         "O'zbekistondan Germaniyaga ishga, Germaniya ish vizasi rasmiylashtirish, "
+                         "Germaniyaga hujjat tayyorlash, nemis tilida rezyume tayyorlash, Ausbildung Germaniya, "
+                         "Germaniyada til kursi, Toshkentda Germaniya ish agentligi, Visa Centrum, Centrum XBA, "
+                         "hususiy bandlik agentligi",
+        "faq_kicker": "Savollar",
+        "faq_title": "Ko'p so'raladigan savollar",
+        "faq1_q": "Germaniyaga ishga ketish uchun nima kerak?",
+        "faq1_a": "Asosan haqiqiy pasport, yo'nalishga mos malaka va to'liq rasmiylashtirilgan hujjatlar "
+                  "paketi talab qilinadi, ba'zi yo'nalishlarda boshlang'ich nemis tili bilimi ham kerak bo'ladi. "
+                  "Aynan sizga qaysi hujjatlar zarur bo'lishini bepul konsultatsiyada aniq ko'rsatib beramiz.",
+        "faq2_q": "Germaniyaga ketish shartlari qanday?",
+        "faq2_a": "Shartlar tanlangan yo'nalishga — ishchi vakansiya, Ausbildung yoki boshqa dastur — qarab "
+                  "farq qiladi: yosh chegarasi, tajriba va til darajasi talablari turlicha bo'ladi. Aniq "
+                  "shartlarni vakansiyalar bo'limida yoki konsultatsiya orqali bilib olishingiz mumkin.",
+        "faq3_q": "Germaniyada ish haqi qancha?",
+        "faq3_a": "Ish haqi lavozim, soha va ish beruvchiga qarab farq qiladi, shuning uchun aniq raqamni "
+                  "oldindan kafolatlab bo'lmaydi. Har bir vakansiyada mavjud shartlar ko'rsatiladi, aniq "
+                  "summa haqida konsultatsiya chog'ida batafsil gaplashamiz.",
+        "faq4_q": "Germaniyaga qanday ishga ketsa bo'ladi?",
+        "faq4_a": "Eng ishonchli yo'l — rasmiy ro'yxatdan o'tgan xususiy bandlik agentligi orqali: "
+                  "konsultatsiya, mos vakansiyani tanlash, hujjatlarni rasmiylashtirish va viza olish "
+                  "bosqichlaridan o'tish. Biz aynan shu jarayonni boshidan oxirigacha kuzatib boramiz.",
+        "faq5_q": "Germaniya ish vizasi qancha turadi?",
+        "faq5_a": "Viza va rasmiylashtirish xarajatlari tanlangan dastur va hujjatlar turiga qarab "
+                  "farqlanadi. Aniq va shaffof narxlarni bepul konsultatsiya chog'ida taqdim etamiz — "
+                  "yashirin to'lovlarsiz.",
+        "team_kicker": "Jamoa",
+        "team_title": "Bizning jamoa",
+        "team_lead": "Loyihamiz ortida turgan va har bir mijoz uchun ishlaydigan mutaxassislar.",
+        "team_empty": "Jamoa ma'lumotlari tez orada qo'shiladi.",
     },
     "de": {
         "nav_home": "Startseite",
@@ -203,6 +238,39 @@ TRANSLATIONS = {
         "footer_contact_link3": "Partner",
         "footer_rights": "© 2026 Visa Centrum XBA. Alle Rechte vorbehalten.",
         "footer_design": "Design: Konzeptmuster",
+        "seo_title": "Legale Arbeit in Deutschland finden — Visa Centrum XBA",
+        "seo_description": "Lizenzierte private Arbeitsvermittlung für legale Beschäftigung in Deutschland "
+                            "und Europa: Beratung, Stellenvermittlung und vollständige Dokumentenbearbeitung.",
+        "seo_keywords": "Arbeiten in Deutschland, Arbeitsvisum Deutschland, legale Arbeitsvermittlung, "
+                         "Ausbildung in Deutschland, Visa Centrum XBA",
+        "faq_kicker": "Fragen",
+        "faq_title": "Häufig gestellte Fragen",
+        "faq1_q": "Was brauche ich, um in Deutschland zu arbeiten?",
+        "faq1_a": "In der Regel einen gültigen Reisepass, passende Qualifikationen für die jeweilige "
+                  "Stelle und vollständig vorbereitete Unterlagen; für manche Stellen sind auch erste "
+                  "Deutschkenntnisse erforderlich. In der kostenlosen Beratung zeigen wir Ihnen genau, "
+                  "welche Unterlagen Sie benötigen.",
+        "faq2_q": "Welche Voraussetzungen gibt es für die Ausreise nach Deutschland?",
+        "faq2_a": "Die Voraussetzungen hängen von der gewählten Richtung ab — Arbeitsstelle, Ausbildung "
+                  "oder ein anderes Programm — und unterscheiden sich bei Altersgrenze, Erfahrung und "
+                  "Sprachniveau. Die genauen Bedingungen erfahren Sie bei den Stellenangeboten oder in "
+                  "der Beratung.",
+        "faq3_q": "Wie hoch ist der Lohn in Deutschland?",
+        "faq3_a": "Der Lohn hängt von Position, Branche und Arbeitgeber ab, daher lässt sich keine feste "
+                  "Zahl im Voraus garantieren. Verfügbare Bedingungen stehen bei jeder Stelle, Details "
+                  "besprechen wir ausführlich in der Beratung.",
+        "faq4_q": "Wie kann ich am sichersten nach Deutschland zur Arbeit gehen?",
+        "faq4_a": "Der zuverlässigste Weg ist eine lizenzierte private Arbeitsvermittlung: Beratung, "
+                  "passende Stelle, vollständige Dokumentenbearbeitung und Visum. Wir begleiten genau "
+                  "diesen Prozess von Anfang bis Ende.",
+        "faq5_q": "Was kostet ein Arbeitsvisum für Deutschland?",
+        "faq5_a": "Die Kosten für Visum und Bearbeitung hängen vom gewählten Programm und den "
+                  "Unterlagen ab. Transparente Preise ohne versteckte Gebühren besprechen wir in der "
+                  "kostenlosen Beratung.",
+        "team_kicker": "Team",
+        "team_title": "Unser Team",
+        "team_lead": "Die Menschen hinter unserem Projekt, die sich für jeden Kunden einsetzen.",
+        "team_empty": "Teaminformationen werden in Kürze hinzugefügt.",
     },
     "en": {
         "nav_home": "Home",
@@ -298,6 +366,36 @@ TRANSLATIONS = {
         "footer_contact_link3": "Partners",
         "footer_rights": "© 2026 Visa Centrum XBA. All rights reserved.",
         "footer_design": "Design: concept sample",
+        "seo_title": "Legal Work in Germany & Europe — Visa Centrum XBA",
+        "seo_description": "Licensed private employment agency for legal work in Germany and Europe: "
+                            "consultation, job placement and full document processing in one place.",
+        "seo_keywords": "work in Germany, Germany work visa, legal employment agency, Ausbildung Germany, "
+                         "Visa Centrum XBA",
+        "faq_kicker": "Questions",
+        "faq_title": "Frequently asked questions",
+        "faq1_q": "What do I need to work in Germany?",
+        "faq1_a": "Generally a valid passport, qualifications matching the position, and a complete set "
+                  "of documents; some positions also require basic German. In a free consultation we show "
+                  "you exactly what you need.",
+        "faq2_q": "What are the requirements to go to Germany?",
+        "faq2_a": "Requirements depend on the track you choose — a job, an Ausbildung programme or "
+                  "another path — and vary in age limits, experience and language level. You can find the "
+                  "exact conditions on each vacancy or during a consultation.",
+        "faq3_q": "How much do jobs in Germany pay?",
+        "faq3_a": "Pay depends on the position, industry and employer, so we can't guarantee a fixed "
+                  "number in advance. Available conditions are listed with each vacancy, and we go into "
+                  "detail during a consultation.",
+        "faq4_q": "What is the safest way to go work in Germany?",
+        "faq4_a": "The most reliable way is through a licensed private employment agency: consultation, "
+                  "matching you to a suitable vacancy, full document processing and the visa itself. We "
+                  "guide you through exactly that process from start to finish.",
+        "faq5_q": "How much does a German work visa cost?",
+        "faq5_a": "Visa and processing costs depend on the chosen programme and documents. We give you "
+                  "transparent pricing with no hidden fees during a free consultation.",
+        "team_kicker": "Team",
+        "team_title": "Our team",
+        "team_lead": "The people behind our project, working for every client.",
+        "team_empty": "Team information will be added soon.",
     },
     "ru": {
         "nav_home": "Главная",
@@ -390,6 +488,36 @@ TRANSLATIONS = {
         "footer_contact_link3": "Партнёры",
         "footer_rights": "© 2026 Visa Centrum XBA. Все права защищены.",
         "footer_design": "Дизайн: концептуальный образец",
+        "seo_title": "Легальная работа в Германии и Европе — Visa Centrum XBA",
+        "seo_description": "Лицензированное частное агентство занятости для легального трудоустройства "
+                            "в Германии и Европе: консультация, подбор вакансии и оформление документов.",
+        "seo_keywords": "работа в Германии, рабочая виза в Германию, легальное агентство занятости, "
+                         "Ausbildung Германия, Visa Centrum XBA",
+        "faq_kicker": "Вопросы",
+        "faq_title": "Часто задаваемые вопросы",
+        "faq1_q": "Что нужно, чтобы уехать на работу в Германию?",
+        "faq1_a": "Как правило — действующий паспорт, квалификация, подходящая под вакансию, и полный "
+                  "пакет оформленных документов; для некоторых направлений нужен базовый уровень немецкого. "
+                  "На бесплатной консультации мы точно скажем, что именно понадобится вам.",
+        "faq2_q": "Какие условия для выезда в Германию?",
+        "faq2_a": "Условия зависят от выбранного направления — вакансия, Ausbildung или другая программа — "
+                  "и отличаются по возрасту, опыту и уровню языка. Точные условия можно узнать в разделе "
+                  "вакансий или на консультации.",
+        "faq3_q": "Сколько платят за работу в Германии?",
+        "faq3_a": "Зарплата зависит от должности, отрасли и работодателя, поэтому точную цифру заранее "
+                  "гарантировать нельзя. Доступные условия указаны у каждой вакансии, подробности "
+                  "обсуждаем на консультации.",
+        "faq4_q": "Как надёжнее уехать на работу в Германию?",
+        "faq4_a": "Самый надёжный способ — через лицензированное частное агентство занятости: "
+                  "консультация, подбор подходящей вакансии, полное оформление документов и визы. Именно "
+                  "этот процесс мы сопровождаем от начала до конца.",
+        "faq5_q": "Сколько стоит рабочая виза в Германию?",
+        "faq5_a": "Стоимость визы и оформления зависит от выбранной программы и пакета документов. "
+                  "Прозрачные цены без скрытых платежей озвучиваем на бесплатной консультации.",
+        "team_kicker": "Команда",
+        "team_title": "Наша команда",
+        "team_lead": "Люди, которые стоят за нашим проектом и работают для каждого клиента.",
+        "team_empty": "Информация о команде будет добавлена позже.",
     },
 }
 

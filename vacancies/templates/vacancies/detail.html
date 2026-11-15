@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ vacancy.title }} - Visa Centrum XBA{% endblock %}
+{% block title %}{{ vacancy.title }} — Visa Centrum XBA{% endblock %}
+{% block meta_description %}{{ vacancy.description|truncatewords:30 }}{% endblock %}
+{% block og_title %}{{ vacancy.title }} — Visa Centrum XBA{% endblock %}
+{% block og_description %}{{ vacancy.description|truncatewords:30 }}{% endblock %}
 
 {% block content %}
 <section style="padding-top:44px;padding-bottom:0;">
@@ -21,7 +24,7 @@
       <div class="vac-detail-body">{{ vacancy.description }}</div>
     </div>
     <div style="margin-top:28px;">
-      <a href="{% url 'home' %}#contact" class="btn btn-primary">{{ T.vacancy_detail_apply }} &rarr;</a>
+      <a href="{% url 'contact' %}" class="btn btn-primary">{{ T.vacancy_detail_apply }} &rarr;</a>
     </div>
   </div>
 </section>

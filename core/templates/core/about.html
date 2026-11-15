@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ T.about_title }} — Visa Centrum XBA{% endblock %}
+{% block meta_description %}{{ T.about_p|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="wrap">
+    <div class="kicker">{{ T.about_kicker }}</div>
+    <h1>{{ T.about_title }}</h1>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-visual reveal">
+      <img src="{% static 'core/img/hoff-logo.png' %}" alt="HOFF Consulting" class="about-logo">
+      <div class="badge">
+        <div>
+          <b>{{ T.about_badge_title }}</b>
+          <span>{{ T.about_badge_sub }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="about-copy reveal">
+      <p>{{ T.about_p }}</p>
+      <div class="check-list">
+        <div class="check-item"><i>&check;</i>{{ T.about_check1 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check2 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check3 }}</div>
+        <div class="check-item"><i>&check;</i>{{ T.about_check4 }}</div>
+      </div>
+      <a href="{% url 'contact' %}" class="btn btn-primary btn-dark">{{ T.about_cta }} &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">{{ T.team_kicker }}</div>
+      <h2>{{ T.team_title }}</h2>
+      <p>{{ T.team_lead }}</p>
+    </div>
+    {% if members %}
+    <div class="team-grid">
+      {% for m in members %}
+      {% if m.linkedin_url %}<a href="{{ m.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="team-card reveal">{% else %}<div class="team-card reveal">{% endif %}
+        <div class="team-photo"><img src="{{ m.photo.url }}" alt="{{ m.name }}" loading="lazy"></div>
+        <div class="team-text">
+          <span class="team-name">{{ m.name }}</span>
+          {% if m.subtitle %}<span class="team-subtitle">{{ m.subtitle }}</span>{% endif %}
+          <span class="team-role">{{ m.role }}</span>
+        </div>
+      {% if m.linkedin_url %}</a>{% else %}</div>{% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="vac-empty">{{ T.team_empty }}</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

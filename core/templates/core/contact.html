@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}{{ T.cta_title }} — Visa Centrum XBA{% endblock %}
+{% block meta_description %}{{ T.cta_lead }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="wrap">
+    <div class="kicker">{{ T.nav_contact }}</div>
+    <h1>{{ T.cta_title }}</h1>
+    <p>{{ T.cta_lead }}</p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_address_label }}</h4>
+            <p>Xurmontepa 27, Toshkent, O'zbekiston</p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5c0-1 1-2 2-2h2l2 5-2 1c1 2.5 3 4.5 5.5 5.5l1-2 5 2v2c0 1-1 2-2 2C10.7 20.5 3.5 13.3 4 5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_phone_label }}</h4>
+            <p><a href="tel:+998783339797">+998 78 333 97 97</a></p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h4>{{ T.contact_email_label }}</h4>
+            <p><a href="mailto:visa.centrum.uz@gmail.com">visa.centrum.uz@gmail.com</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-card">
+        {% if sent %}
+        <div class="contact-success">
+          <div class="contact-success-icon">&check;</div>
+          <h3>{{ T.contact_success_title }}</h3>
+          <p>{{ T.contact_success_text }}</p>
+        </div>
+        {% else %}
+        <form method="post" class="contact-form">
+          {% csrf_token %}
+          <div class="form-row">
+            <label for="id_full_name">{{ T.contact_field_name }}</label>
+            {{ form.full_name }}
+          </div>
+          <div class="form-row">
+            <label for="id_email">{{ T.contact_field_email }}</label>
+            {{ form.email }}
+          </div>
+          <div class="form-row">
+            <label for="id_phone">{{ T.contact_field_phone }}</label>
+            {{ form.phone }}
+          </div>
+          <div class="form-row">
+            <label for="id_message">{{ T.contact_field_message }}</label>
+            {{ form.message }}
+          </div>
+          <button type="submit" class="btn btn-primary">{{ T.contact_submit }} &rarr;</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">{{ T.faq_kicker }}</div>
+      <h2>{{ T.faq_title }}</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item reveal">
+        <summary>{{ T.faq1_q }}</summary>
+        <p>{{ T.faq1_a }}</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>{{ T.faq2_q }}</summary>
+        <p>{{ T.faq2_a }}</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>{{ T.faq3_q }}</summary>
+        <p>{{ T.faq3_a }}</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>{{ T.faq4_q }}</summary>
+        <p>{{ T.faq4_a }}</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>{{ T.faq5_q }}</summary>
+        <p>{{ T.faq5_a }}</p>
+      </details>
+    </div>
+  </div>
+</section>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "{{ T.faq1_q|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ T.faq1_a|escapejs }}"}},
+    {"@type": "Question", "name": "{{ T.faq2_q|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ T.faq2_a|escapejs }}"}},
+    {"@type": "Question", "name": "{{ T.faq3_q|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ T.faq3_a|escapejs }}"}},
+    {"@type": "Question", "name": "{{ T.faq4_q|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ T.faq4_a|escapejs }}"}},
+    {"@type": "Question", "name": "{{ T.faq5_q|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ T.faq5_a|escapejs }}"}}
+  ]
+}
+</script>
+{% endblock %}

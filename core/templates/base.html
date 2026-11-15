@@ -3,8 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}Visa Centrum XBA{% endblock %}</title>
+<title>{% block title %}{{ T.seo_title }}{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}{{ T.seo_description }}{% endblock %}">
+{% block meta_keywords %}{% if T.seo_keywords %}<meta name="keywords" content="{{ T.seo_keywords }}">{% endif %}{% endblock %}
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+{% for code, path in HREFLANG_PATHS.items %}
+<link rel="alternate" hreflang="{{ code }}" href="{{ request.scheme }}://{{ request.get_host }}{{ path }}">
+{% endfor %}
+<link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ HREFLANG_PATHS.uz }}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Visa Centrum XBA">
+<meta property="og:title" content="{% block og_title %}{{ T.seo_title }}{% endblock %}">
+<meta property="og:description" content="{% block og_description %}{{ T.seo_description }}{% endblock %}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'core/img/logo.png' %}">
+<meta property="og:locale" content="{{ CUR_LANG }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ T.seo_title }}">
+<meta name="twitter:description" content="{{ T.seo_description }}">
+
+<link rel="icon" href="{% static 'core/img/favicon.ico' %}" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/img/favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/img/favicon-16x16.png' %}">
+<link rel="apple-touch-icon" href="{% static 'core/img/apple-touch-icon.png' %}">
 <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EmploymentAgency",
+  "name": "Visa Centrum XBA",
+  "url": "{{ request.scheme }}://{{ request.get_host }}/",
+  "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'core/img/logo.png' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'core/img/logo.png' %}",
+  "telephone": "+998783339797",
+  "email": "visa.centrum.uz@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Xurmontepa 27",
+    "addressLocality": "Tashkent",
+    "addressCountry": "UZ"
+  },
+  "areaServed": "UZ",
+  "serviceType": "Employment and visa processing for Germany and Europe"
+}
+</script>
+{% block extra_head %}{% endblock %}
 </head>
 <body>
 
@@ -17,10 +62,10 @@
     <div class="nav-center">
       <nav class="links">
         <a href="{% url 'home' %}">{{ T.nav_home }}</a>
-        <a href="{% url 'home' %}#about">{{ T.nav_about }}</a>
-        <a href="{% url 'home' %}#services">{{ T.nav_services }}</a>
+        <a href="{% url 'about' %}">{{ T.nav_about }}</a>
+        <a href="{% url 'services' %}">{{ T.nav_services }}</a>
         <a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a>
-        <a href="{% url 'home' %}#contact">{{ T.nav_contact }}</a>
+        <a href="{% url 'contact' %}">{{ T.nav_contact }}</a>
       </nav>
     </div>
     <div class="nav-right">
@@ -37,7 +82,7 @@
           {% endfor %}
         </form>
       </div>
-      <a href="{% url 'home' %}#contact" class="nav-cta">{{ T.header_cta }}</a>
+      <a href="{% url 'contact' %}" class="nav-cta">{{ T.header_cta }}</a>
       <button type="button" class="burger" id="menu-toggle" aria-label="Menyu" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-menu">
         <span></span><span></span><span></span>
       </button>
@@ -47,12 +92,12 @@
     <div class="mobile-menu-inner">
       <nav class="mobile-links">
         <a href="{% url 'home' %}">{{ T.nav_home }}</a>
-        <a href="{% url 'home' %}#about">{{ T.nav_about }}</a>
-        <a href="{% url 'home' %}#services">{{ T.nav_services }}</a>
+        <a href="{% url 'about' %}">{{ T.nav_about }}</a>
+        <a href="{% url 'services' %}">{{ T.nav_services }}</a>
         <a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a>
-        <a href="{% url 'home' %}#contact">{{ T.nav_contact }}</a>
+        <a href="{% url 'contact' %}">{{ T.nav_contact }}</a>
       </nav>
-      <a href="{% url 'home' %}#contact" class="btn btn-primary mobile-cta">{{ T.header_cta }}</a>
+      <a href="{% url 'contact' %}" class="btn btn-primary mobile-cta">{{ T.header_cta }}</a>
     </div>
   </div>
 </header>
@@ -79,24 +124,24 @@
         <h5>{{ T.footer_nav_title }}</h5>
         <ul>
           <li><a href="{% url 'home' %}">{{ T.nav_home }}</a></li>
-          <li><a href="{% url 'home' %}#about">{{ T.nav_about }}</a></li>
-          <li><a href="{% url 'home' %}#services">{{ T.nav_services }}</a></li>
+          <li><a href="{% url 'about' %}">{{ T.nav_about }}</a></li>
+          <li><a href="{% url 'services' %}">{{ T.nav_services }}</a></li>
           <li><a href="{% url 'vacancy_list' %}">{{ T.nav_vacancies }}</a></li>
         </ul>
       </div>
       <div>
         <h5>{{ T.footer_services_title }}</h5>
         <ul>
-          <li><a href="{% url 'home' %}#services">{{ T.service1_title }}</a></li>
-          <li><a href="{% url 'home' %}#services">{{ T.service2_title }}</a></li>
-          <li><a href="{% url 'home' %}#services">{{ T.service3_title }}</a></li>
-          <li><a href="{% url 'home' %}#services">{{ T.service4_title }}</a></li>
+          <li><a href="{% url 'services' %}">{{ T.service1_title }}</a></li>
+          <li><a href="{% url 'services' %}">{{ T.service2_title }}</a></li>
+          <li><a href="{% url 'services' %}">{{ T.service3_title }}</a></li>
+          <li><a href="{% url 'services' %}">{{ T.service4_title }}</a></li>
         </ul>
       </div>
       <div>
         <h5>{{ T.footer_contact_title }}</h5>
         <ul>
-          <li><a href="{% url 'home' %}#contact">{{ T.footer_contact_link1 }}</a></li>
+          <li><a href="{% url 'contact' %}">{{ T.footer_contact_link1 }}</a></li>
           <li><a href="#">{{ T.footer_contact_link2 }}</a></li>
           <li><a href="#">{{ T.footer_contact_link3 }}</a></li>
         </ul>

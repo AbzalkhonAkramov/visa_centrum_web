@@ -23,9 +23,17 @@ def i18n(request):
     else:
         next_path = path
 
+    # Equivalent path of the current page in every supported language, for
+    # hreflang alternate links (e.g. {"uz": "/vacancies/", "de": "/de/vacancies/", ...}).
+    hreflang_paths = {
+        code: (next_path if code == "uz" else f"/{code}{next_path}")
+        for code in TRANSLATIONS
+    }
+
     return {
         "T": TRANSLATIONS[lang],
         "CUR_LANG": lang,
         "LANGUAGES_LIST": LANGUAGE_LABELS,
         "LANG_NEUTRAL_PATH": next_path,
+        "HREFLANG_PATHS": hreflang_paths,
     }
