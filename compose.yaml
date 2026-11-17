@@ -4,12 +4,11 @@ services:
       context: .
     ports:
       - "8001:8001"
-    environment:
-      DJANGO_DEBUG: "true"
-      DJANGO_SECRET_KEY: "docker-development-only-change-me"
-      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0,*"
-      DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:8001,http://127.0.0.1:8001,https://*.trycloudflare.com"
+    env_file: .env
     volumes:
       - ./db.sqlite3:/app/db.sqlite3
-      - ./media:/app/media
+      - static_data:/app/staticfiles
     restart: unless-stopped
+
+volumes:
+  static_data:
