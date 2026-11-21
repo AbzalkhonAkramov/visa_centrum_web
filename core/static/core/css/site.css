@@ -255,7 +255,7 @@ section{padding:88px 0;}
 .team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:72px 22px;margin-top:84px;}
 .team-card{
   position:relative;display:flex;align-items:flex-end;
-  aspect-ratio:11/5;border-radius:var(--radius);overflow:visible;
+  height:210px;border-radius:var(--radius);overflow:visible;
   background:#7f94e6;text-decoration:none;padding:28px;
   min-width:0;
   transition:transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
@@ -268,10 +268,13 @@ section{padding:88px 0;}
   width:100%;height:100%;object-fit:cover;object-position:top center;
   display:block;
 }
-.team-text{position:relative;z-index:2;display:flex;flex-direction:column;max-width:48%;min-width:0;}
-.team-name{color:#fff;font-weight:500;font-size:15px;overflow-wrap:break-word;}
-.team-subtitle{color:#fff;font-weight:500;font-size:15px;overflow-wrap:break-word;}
-.team-role{color:#fff;font-weight:800;font-size:27px;line-height:1.15;margin-top:6px;letter-spacing:-.3px;overflow-wrap:break-word;}
+.team-text{position:relative;z-index:2;display:flex;flex-direction:column;max-width:52%;min-width:0;}
+.team-name{color:#fff;font-weight:500;font-size:13px;overflow-wrap:break-word;}
+.team-subtitle{color:#fff;font-weight:500;font-size:13px;overflow-wrap:break-word;}
+.team-role{
+  color:#fff;font-weight:800;font-size:19px;line-height:1.2;margin-top:5px;letter-spacing:-.2px;
+  overflow-wrap:break-word;
+}
 
 @media (hover:hover) and (pointer:fine){
   .team-card:hover{transform:translateY(-4px);box-shadow:0 18px 36px -18px rgba(27,24,255,.4);}
@@ -282,8 +285,8 @@ section{padding:88px 0;}
 }
 @media (max-width:560px){
   .team-grid{grid-template-columns:minmax(0,1fr);gap:48px;}
-  .team-card{aspect-ratio:4/3;}
-  .team-role{font-size:24px;}
+  .team-card{height:230px;}
+  .team-role{font-size:18px;}
 }
 
 /* VACANCIES (list + detail pages) */
