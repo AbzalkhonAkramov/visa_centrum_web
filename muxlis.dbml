@@ -1,0 +1,759 @@
+// =====================================================================
+// Muxlis — donation & subscription platform for influencers (MVP)
+// ERD based on ТЗ (Nov 13, 2026), sections 4, 6, 7,
+// and the UI design canvas v2 ("Muxlis — UI дизайн", page v2).
+//
+// Paste into https://dbdiagram.io to render.
+//
+// Authentication = Keycloak (own database keycloak_db, managed by Keycloak).
+//   * Keycloak owns: credentials, phone / email, Telegram-bot OTP login
+//     (custom authenticator), Telegram Login + Google (identity brokering),
+//     sessions, access/refresh tokens, realm roles FAN | CREATOR | MODERATOR | ADMIN,
+//     user enable/disable.
+//   * Our services never store passwords, tokens, OTP codes or roles.
+//   * users_db.users.id = Keycloak user id (JWT "sub"). Every other
+//     user_id in every DB is that same id.
+//   * Keycloak is shown below as a read-only reference table (not created by us).
+//
+// Conventions (ТЗ §7):
+//   * 5 PostgreSQL databases, one per service (shown as schemas here),
+//     plus keycloak_db that belongs to Keycloak.
+//   * PK = UUID v7; every table has created_at / updated_at.
+//   * Money = BIGINT in tiyin (1 UZS = 100 tiyin).
+//   * Refs INSIDE one DB  = real foreign keys.
+//   * Refs ACROSS DBs     = logical only (UUID, no FK) — listed at the bottom.
+//   * Tables marked [ADDED] are not in the ТЗ table list but are required
+//     by functional requirements (the requirement ID is given).
+// =====================================================================
+
+
+// ---------------------------------------------------------------------
+// keycloak_db  (Keycloak — NOT our schema, shown for reference only)
+// ---------------------------------------------------------------------
+
+Table keycloak.user_entity {
+  id uuid [pk, note: 'JWT sub — used as user_id in all services']
+  username varchar [note: '+998... phone']
+  email varchar
+  enabled boolean [note: 'false = blocked (US-8)']
+  realm_roles text [note: 'FAN | CREATOR | MODERATOR | ADMIN (US-5)']
+  attributes text [note: 'phone, telegram_id, telegram_chat_id, locale']
+  federated_identities text [note: 'google, telegram (US-2)']
+  Note: 'Managed by Keycloak in keycloak_db. Covers US-1 (OTP via Telegram bot, custom authenticator), US-2, US-3 (tokens, logout all sessions), US-5 (roles), US-8 (enable/disable).'
+}
+
+
+// ---------------------------------------------------------------------
+// users_db  (user-service)
+// ---------------------------------------------------------------------
+
+Table users_db.users {
+  id uuid [pk, note: '= Keycloak user id (sub). Row created on first login (JIT) or from Keycloak REGISTER event']
+  display_name varchar(100)
+  avatar_media_id uuid [note: 'logical -> media_db.media']
+  language varchar(8) [not null, default: 'uz_latn', note: 'uz_latn | uz_cyrl | ru | en (US-4)']
+  theme varchar(8) [default: 'system', note: 'light | dark | system']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: 'Profile only. Phone, email, password, roles, sessions and tokens live in Keycloak.'
+}
+
+Table users_db.user_blocks {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users_db.users.id]
+  reason text [not null]
+  blocked_by uuid [not null, ref: > users_db.users.id, note: 'admin']
+  unblocked_at timestamptz
+  unblocked_by uuid [ref: > users_db.users.id]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] US-8 — history and reason. The block itself = Keycloak user enabled=false (via Admin API)'
+}
+
+Table users_db.legal_acceptances {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users_db.users.id]
+  document varchar(16) [not null, note: 'OFFER | PRIVACY | RULES']
+  version varchar(16) [not null]
+  accepted_at timestamptz [not null]
+  ip inet
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] UI v2: Login and Checkout screens ask to accept the offer and privacy policy'
+}
+
+Table users_db.categories {
+  id uuid [pk]
+  slug varchar(50) [unique, not null]
+  name_uz_latn varchar(100)
+  name_uz_cyrl varchar(100)
+  name_ru varchar(100)
+  name_en varchar(100)
+  position int
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] US-6, CS-8 — creator category'
+}
+
+Table users_db.creators {
+  id uuid [pk]
+  user_id uuid [not null, unique, ref: - users_db.users.id]
+  slug varchar(30) [not null, unique, note: '^[a-z0-9_]{3,30}$']
+  display_name varchar(100) [not null]
+  bio text
+  cover_media_id uuid [note: 'logical -> media_db.media']
+  category_id uuid [ref: > users_db.categories.id]
+  city varchar(64) [note: 'UI v2: "Musiqachi · Toshkent"']
+  kyc_status varchar(16) [not null, default: 'NONE', note: 'NONE | PENDING | APPROVED | REJECTED (denormalized from last kyc_request); APPROVED = "✓ Tasdiqlangan" badge']
+  status varchar(16) [not null, default: 'ACTIVE', note: 'ACTIVE | HIDDEN (profile hidden by moderator)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table users_db.creator_social_links {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > users_db.creators.id]
+  platform varchar(20) [not null, note: 'instagram | telegram | youtube | tiktok | other']
+  url varchar(500) [not null]
+  position int
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] US-6'
+}
+
+Table users_db.kyc_requests {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > users_db.creators.id]
+  status varchar(16) [not null, note: 'PENDING | APPROVED | REJECTED (US-7)']
+  full_name_enc bytea [note: 'AES-256']
+  passport_number_enc bytea [note: 'AES-256']
+  birth_date_enc bytea [note: 'AES-256']
+  passport_scan_key varchar(500) [note: 'private SeaweedFS bucket']
+  selfie_key varchar(500) [note: 'private SeaweedFS bucket']
+  reviewed_by uuid [ref: > users_db.users.id, note: 'moderator']
+  reviewed_at timestamptz
+  reject_reason text
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table users_db.admin_audit_log {
+  id uuid [pk]
+  actor_user_id uuid [not null, ref: > users_db.users.id]
+  action varchar(64) [not null, note: 'USER_BLOCK, KYC_APPROVE, REFUND, PAYOUT_APPROVE, SETTINGS_CHANGE ...']
+  target_service varchar(20) [note: 'user | content | payment ...']
+  target_type varchar(32)
+  target_id uuid
+  payload jsonb [note: 'before / after']
+  ip inet
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] AD-5 — append-only'
+}
+
+Table users_db.outbox {
+  id uuid [pk]
+  aggregate_type varchar(32)
+  aggregate_id uuid
+  event_type varchar(64) [note: 'user.registered | creator.verified']
+  payload jsonb
+  published_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] user-service publishes events (§6) -> transactional outbox (§3)'
+}
+
+
+// ---------------------------------------------------------------------
+// content_db  (content-service)
+// ---------------------------------------------------------------------
+
+Table content_db.creator_profiles {
+  creator_id uuid [pk, note: 'logical -> users_db.creators']
+  user_id uuid [not null]
+  slug varchar(30) [not null, unique]
+  display_name varchar(100)
+  bio text
+  avatar_media_id uuid
+  cover_media_id uuid
+  category_slug varchar(50)
+  city varchar(64)
+  is_verified boolean [not null, default: false, note: 'from creator.verified']
+  subscribers_count int [not null, default: 0, note: 'from payment events; Explore "1 240 obunachi", sort "Mashhurlari"']
+  posts_count int [not null, default: 0, note: 'Creator page "86 post"']
+  min_tier_price bigint [note: 'Explore card "15 000 so\'mdan", sort "Narx: arzonroq"']
+  search_vector tsvector [note: 'GIN index, PostgreSQL full-text (CS-8)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] read-model synced from user-service and payment-service events; powers Explore, Creator page header and Feed'
+}
+
+Table content_db.posts {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > content_db.creator_profiles.creator_id]
+  kind varchar(8) [not null, note: 'POST | STORY']
+  title varchar(200) [note: 'UI v2: post title; story label ("Studiya", "Konsert")']
+  text varchar(10000)
+  access_type varchar(8) [not null, note: 'PUBLIC | TIER | PPV (CS-3). Applies to stories too']
+  min_tier_position smallint [note: 'TIER: tier N and above']
+  ppv_price bigint [note: 'tiyin. Required for PPV; optional for TIER = "Faqat shu postni 25 000 so\'mga ochish"']
+  status varchar(16) [not null, note: 'DRAFT | SCHEDULED | PUBLISHED | HIDDEN | DELETED']
+  scheduled_at timestamptz [note: 'CS-5']
+  published_at timestamptz
+  expires_at timestamptz [note: 'STORY: published_at + 24h (CS-2)']
+  comments_enabled boolean [not null, default: true]
+  likes_count int [not null, default: 0]
+  comments_count int [not null, default: 0]
+  views_count int [not null, default: 0, note: 'Studio "Ko\'rishlar" column']
+  hidden_by uuid [note: 'moderator (CS-9)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes {
+    (creator_id, published_at)
+    (status, scheduled_at)
+  }
+}
+
+Table content_db.post_media {
+  id uuid [pk]
+  post_id uuid [not null, ref: > content_db.posts.id]
+  media_id uuid [not null, note: 'logical -> media_db.media']
+  position smallint [not null, note: '0..9 (max 10)']
+  media_type varchar(8) [note: 'IMAGE | VIDEO | AUDIO | FILE (copy)']
+  is_ready boolean [default: false, note: 'set on media.ready']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (post_id, position) [unique] }
+}
+
+Table content_db.comments {
+  id uuid [pk]
+  post_id uuid [not null, ref: > content_db.posts.id]
+  user_id uuid [not null, note: 'logical -> users_db.users']
+  parent_id uuid [ref: > content_db.comments.id, note: 'one reply level only (CS-6)']
+  text varchar(2000) [not null]
+  status varchar(16) [not null, default: 'VISIBLE', note: 'VISIBLE | DELETED | HIDDEN']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table content_db.likes {
+  post_id uuid [ref: > content_db.posts.id]
+  user_id uuid [note: 'logical -> users_db.users']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (post_id, user_id) [pk] }
+}
+
+Table content_db.moderation_cases {
+  id uuid [pk]
+  target_type varchar(8) [not null, note: 'POST | COMMENT | PROFILE']
+  post_id uuid [ref: > content_db.posts.id]
+  comment_id uuid [ref: > content_db.comments.id]
+  creator_id uuid [ref: > content_db.creator_profiles.creator_id, note: 'PROFILE target, or author of post']
+  author_id uuid [not null, note: 'Admin "Muallif" column']
+  top_reason varchar(32) [note: 'most frequent reason']
+  reports_count int [not null, default: 0, note: 'Admin "Shikoyatlar" column']
+  status varchar(16) [not null, default: 'OPEN', note: 'OPEN | CONTENT_HIDDEN | REJECTED']
+  resolved_by uuid [note: 'moderator']
+  resolved_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] UI v2 Admin queue: one row per reported item, filters Postlar / Izohlar / Profillar. Unique open case per target'
+}
+
+Table content_db.reports {
+  id uuid [pk]
+  case_id uuid [not null, ref: > content_db.moderation_cases.id]
+  reporter_id uuid [not null, note: 'logical -> users_db.users']
+  reason varchar(32) [not null, note: 'SPAM | FRAUD | COPYRIGHT | FAKE_ACCOUNT | ABUSE | NUDITY | OTHER']
+  details text
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (case_id, reporter_id) [unique] }
+}
+
+Table content_db.access_grants {
+  id uuid [pk]
+  user_id uuid [not null]
+  creator_id uuid [not null]
+  grant_type varchar(8) [not null, note: 'TIER | PPV']
+  tier_position smallint
+  post_id uuid [ref: > content_db.posts.id]
+  valid_until timestamptz [note: 'null for PPV (lifetime)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] access cache from payment.succeeded / subscription.expired (§6). Can live in Redis instead; source of truth = payment-service GET /access.'
+}
+
+Table content_db.outbox {
+  id uuid [pk]
+  event_type varchar(64) [note: 'post.published']
+  aggregate_id uuid
+  payload jsonb
+  published_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+
+// ---------------------------------------------------------------------
+// media_db  (media-service)
+// ---------------------------------------------------------------------
+
+Table media_db.media {
+  id uuid [pk]
+  owner_id uuid [not null, note: 'logical -> users_db.users']
+  type varchar(8) [not null, note: 'IMAGE | VIDEO | AUDIO | FILE']
+  mime_type varchar(100) [not null]
+  size_bytes bigint [note: 'IMAGE <= 20MB, VIDEO <= 2GB, AUDIO <= 200MB']
+  original_filename varchar(255)
+  bucket varchar(64) [not null]
+  storage_key varchar(500) [not null]
+  s3_upload_id varchar(255) [note: 'multipart upload id (MS-1)']
+  status varchar(16) [not null, note: 'UPLOADING | UPLOADED | PROCESSING | READY | FAILED (MS-3)']
+  failure_reason text
+  width int
+  height int
+  duration_sec int [note: 'stories <= 60s']
+  is_paid boolean [default: false, note: 'watermark with viewer id (MS-5)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table media_db.upload_parts {
+  media_id uuid [ref: > media_db.media.id]
+  part_number int
+  etag varchar(128)
+  size_bytes bigint
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (media_id, part_number) [pk] }
+  Note: '[ADDED] MS-1 — resumable multipart upload'
+}
+
+Table media_db.media_renditions {
+  id uuid [pk]
+  media_id uuid [not null, ref: > media_db.media.id]
+  kind varchar(16) [not null, note: 'THUMB_S | THUMB_M | THUMB_L | BLUR | HLS_MASTER | HLS_360 | HLS_720 | HLS_1080']
+  storage_key varchar(500) [not null, note: '.jpg / .m3u8 playlist']
+  width int
+  height int
+  bitrate_kbps int
+  size_bytes bigint
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (media_id, kind) [unique] }
+}
+
+Table media_db.outbox {
+  id uuid [pk]
+  event_type varchar(64) [note: 'media.ready']
+  aggregate_id uuid
+  payload jsonb
+  published_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+
+// ---------------------------------------------------------------------
+// payment_db  (payment-service)
+// ---------------------------------------------------------------------
+
+Table payment_db.platform_settings {
+  key varchar(64) [pk, note: 'commission_percent=10, hold_days=7, payout_manual_limit, ...']
+  value jsonb [not null]
+  updated_by uuid
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] AD-4'
+}
+
+Table payment_db.creator_accounts {
+  creator_id uuid [pk, note: 'logical -> users_db.creators']
+  user_id uuid [not null]
+  min_donation_amount bigint [not null, default: 500000, note: 'tiyin (PS-4)']
+  kyc_approved boolean [not null, default: false, note: 'from creator.verified; payout blocked if false']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] creator projection inside payment_db'
+}
+
+Table payment_db.tiers {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > payment_db.creator_accounts.creator_id]
+  name varchar(100) [not null]
+  description text
+  price bigint [not null, note: 'tiyin, 500 000 .. 500 000 000 (5k..5M UZS)']
+  position smallint [not null, note: '1..5, used for "tier N and above"']
+  benefits jsonb [note: 'UI v2 Checkout: list of perks ("✓ Storislar faqat obunachilar uchun")']
+  is_highlighted boolean [not null, default: false, note: 'UI v2: "Ommabop" badge, one per creator']
+  status varchar(10) [not null, default: 'ACTIVE', note: 'ACTIVE | ARCHIVED']
+  archived_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: 'max 5 active per creator (PS-1)'
+}
+
+Table payment_db.creator_daily_stats {
+  creator_id uuid [ref: > payment_db.creator_accounts.creator_id]
+  day date
+  revenue bigint [not null, default: 0, note: 'creator share, tiyin']
+  subscription_revenue bigint [not null, default: 0]
+  donation_revenue bigint [not null, default: 0]
+  ppv_revenue bigint [not null, default: 0]
+  donations_count int [not null, default: 0]
+  new_subscribers int [not null, default: 0]
+  churned_subscribers int [not null, default: 0]
+  active_subscribers int [not null, default: 0]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (creator_id, day) [pk] }
+  Note: '[ADDED] UI v2 Studio dashboard: revenue chart (7 / 30 days), "+18% o\'tgan oyga", "+38 yangi · −9 ketgan". Rebuildable from ledger_entries + subscriptions'
+}
+
+Table payment_db.saved_cards {
+  id uuid [pk]
+  user_id uuid [not null, note: 'fan']
+  provider varchar(8) [not null, note: 'PAYME | CLICK | UZUM']
+  card_token varchar(255) [not null, note: 'token only, no PAN']
+  card_mask varchar(19) [not null, note: '8600 **** **** 1234']
+  expires varchar(5)
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] PS-2 — card token for auto-renew'
+}
+
+Table payment_db.subscriptions {
+  id uuid [pk]
+  user_id uuid [not null, note: 'fan']
+  creator_id uuid [not null, ref: > payment_db.creator_accounts.creator_id]
+  tier_id uuid [not null, ref: > payment_db.tiers.id]
+  next_tier_id uuid [ref: > payment_db.tiers.id, note: 'downgrade from next period (PS-3)']
+  saved_card_id uuid [ref: > payment_db.saved_cards.id]
+  status varchar(16) [not null, note: 'PENDING | ACTIVE | PAST_DUE | CANCELED | EXPIRED']
+  auto_renew boolean [not null, default: true]
+  current_period_start timestamptz
+  current_period_end timestamptz [note: '+30 days']
+  renewal_attempts smallint [default: 0, note: 'max 3, then EXPIRED']
+  next_attempt_at timestamptz
+  reminder_sent_at timestamptz [note: '3 days before end']
+  canceled_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: 'UNIQUE (user_id, creator_id) WHERE status IN (ACTIVE, PAST_DUE) — one active per pair'
+}
+
+Table payment_db.payments {
+  id uuid [pk]
+  user_id uuid [not null, note: 'payer']
+  creator_id uuid [not null, ref: > payment_db.creator_accounts.creator_id]
+  type varchar(16) [not null, note: 'SUBSCRIPTION | DONATION | PPV']
+  subscription_id uuid [ref: > payment_db.subscriptions.id]
+  amount bigint [not null, note: 'tiyin']
+  currency char(3) [not null, default: 'UZS']
+  provider varchar(8) [not null, note: 'PAYME | CLICK | UZUM']
+  provider_txn_id varchar(128)
+  idempotency_key varchar(64) [unique, note: 'Idempotency-Key header']
+  status varchar(16) [not null, note: 'CREATED | PENDING | SUCCEEDED | FAILED | CANCELED | REFUNDED']
+  failure_reason text
+  paid_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (provider, provider_txn_id) [unique] }
+  Note: 'never deleted; corrections only via refunds + reverse ledger entries'
+}
+
+Table payment_db.donations {
+  id uuid [pk]
+  payment_id uuid [not null, unique, ref: - payment_db.payments.id]
+  user_id uuid [not null]
+  creator_id uuid [not null]
+  amount bigint [not null]
+  message varchar(300)
+  is_anonymous boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table payment_db.ppv_purchases {
+  id uuid [pk]
+  payment_id uuid [not null, unique, ref: - payment_db.payments.id]
+  user_id uuid [not null]
+  post_id uuid [not null, note: 'logical -> content_db.posts']
+  creator_id uuid [not null]
+  price bigint [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (user_id, post_id) [unique] }
+  Note: 'lifetime access (PS-5)'
+}
+
+Table payment_db.refunds {
+  id uuid [pk]
+  payment_id uuid [not null, ref: > payment_db.payments.id]
+  amount bigint [not null]
+  reason text
+  admin_id uuid [not null]
+  status varchar(16) [note: 'PENDING | COMPLETED | FAILED']
+  provider_refund_id varchar(128)
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] PS-10 — only during hold period'
+}
+
+Table payment_db.payout_cards {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > payment_db.creator_accounts.creator_id]
+  provider varchar(8) [not null, note: 'PAYME | CLICK']
+  card_token varchar(255) [not null]
+  card_mask varchar(19) [not null]
+  holder_name varchar(100)
+  is_default boolean [default: false]
+  status varchar(10) [default: 'ACTIVE']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table payment_db.payouts {
+  id uuid [pk]
+  creator_id uuid [not null, ref: > payment_db.creator_accounts.creator_id]
+  payout_card_id uuid [not null, ref: > payment_db.payout_cards.id]
+  amount bigint [not null]
+  status varchar(20) [not null, note: 'REQUESTED | AWAITING_APPROVAL | PROCESSING | COMPLETED | FAILED | REJECTED']
+  requires_approval boolean [not null, default: false, note: 'amount > limit (PS-9)']
+  approved_by uuid
+  approved_at timestamptz
+  provider varchar(8)
+  provider_txn_id varchar(128)
+  failure_reason text
+  completed_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table payment_db.ledger_entries {
+  id uuid [pk]
+  journal_id uuid [not null, note: 'groups entries of one operation; SUM(amount) per journal = 0']
+  payment_id uuid [ref: > payment_db.payments.id]
+  refund_id uuid [ref: > payment_db.refunds.id]
+  payout_id uuid [ref: > payment_db.payouts.id]
+  account varchar(24) [not null, note: 'PROVIDER_CLEARING | CREATOR_HOLD | CREATOR_AVAILABLE | CREATOR_PAID_OUT | PLATFORM_FEE | PROVIDER_FEE']
+  creator_id uuid [ref: > payment_db.creator_accounts.creator_id, note: 'for CREATOR_* accounts']
+  amount bigint [not null, note: 'signed, tiyin']
+  hold_until timestamptz [note: 'CREATOR_HOLD: +7 days (PS-7)']
+  reversal_of uuid [ref: > payment_db.ledger_entries.id]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: 'append-only. Balance (available / hold / paid out, PS-8) = SUM(amount) by account, no stored balance field'
+}
+
+Table payment_db.webhook_events {
+  id uuid [pk]
+  provider varchar(8) [not null]
+  method varchar(64) [note: 'Payme: CheckPerformTransaction/CreateTransaction/PerformTransaction...; Click: prepare/complete']
+  provider_txn_id varchar(128)
+  payment_id uuid [ref: > payment_db.payments.id]
+  payload jsonb [not null]
+  signature_valid boolean
+  source_ip inet
+  response jsonb
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] PS-6 — raw webhook log & idempotency'
+}
+
+Table payment_db.reconciliation_reports {
+  id uuid [pk]
+  provider varchar(8) [not null]
+  report_date date [not null]
+  status varchar(16) [note: 'OK | MISMATCH']
+  total_ours bigint
+  total_provider bigint
+  mismatch_count int
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (provider, report_date) [unique] }
+  Note: '[ADDED] PS-11'
+}
+
+Table payment_db.reconciliation_items {
+  id uuid [pk]
+  report_id uuid [not null, ref: > payment_db.reconciliation_reports.id]
+  payment_id uuid [ref: > payment_db.payments.id]
+  provider_txn_id varchar(128)
+  issue varchar(24) [note: 'MISSING_OURS | MISSING_PROVIDER | AMOUNT_DIFF | STATUS_DIFF']
+  our_amount bigint
+  provider_amount bigint
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table payment_db.outbox {
+  id uuid [pk]
+  event_type varchar(64) [note: 'payment.succeeded | payment.failed | subscription.expired | payout.completed']
+  aggregate_id uuid
+  payload jsonb
+  published_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+
+// ---------------------------------------------------------------------
+// notify_db  (notification-service)
+// ---------------------------------------------------------------------
+
+Table notify_db.recipients {
+  user_id uuid [pk, note: 'logical -> users_db.users (= Keycloak sub)']
+  language varchar(8) [not null]
+  email varchar(255)
+  telegram_chat_id bigint [note: 'from Keycloak user attribute (set when user shares contact with the bot)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] projection from user.registered / profile updates (NS-3 language choice)'
+}
+
+Table notify_db.devices {
+  id uuid [pk]
+  user_id uuid [not null, ref: > notify_db.recipients.user_id]
+  platform varchar(8) [not null, note: 'IOS | ANDROID | WEB']
+  push_token varchar(512) [not null, unique, note: 'FCM / APNs']
+  last_seen_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table notify_db.notification_settings {
+  user_id uuid [ref: > notify_db.recipients.user_id]
+  type varchar(32) [note: 'NEW_POST | NEW_SUBSCRIBER | DONATION | PAYMENT_OK | PAYMENT_FAILED | SUB_EXPIRING | KYC_DECIDED | PAYOUT_DONE']
+  channel varchar(10) [note: 'PUSH | EMAIL | TELEGRAM | IN_APP']
+  enabled boolean [not null, default: true, note: 'PAYMENT_* cannot be disabled (NS-4)']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (user_id, type, channel) [pk] }
+}
+
+Table notify_db.notification_templates {
+  id uuid [pk]
+  type varchar(32) [not null]
+  channel varchar(10) [not null]
+  language varchar(8) [not null, note: 'uz_latn | uz_cyrl | ru | en']
+  subject varchar(255)
+  body text [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  indexes { (type, channel, language) [unique] }
+  Note: '[ADDED] NS-3'
+}
+
+Table notify_db.notifications {
+  id uuid [pk]
+  user_id uuid [not null, ref: > notify_db.recipients.user_id]
+  type varchar(32) [not null]
+  title varchar(255)
+  body text
+  data jsonb [note: 'deep link, post_id, amount ...']
+  read_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table notify_db.notification_deliveries {
+  id uuid [pk]
+  notification_id uuid [not null, ref: > notify_db.notifications.id]
+  channel varchar(10) [not null]
+  status varchar(10) [not null, note: 'QUEUED | SENT | FAILED']
+  error text
+  sent_at timestamptz
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Note: '[ADDED] per-channel delivery status'
+}
+
+
+// ---------------------------------------------------------------------
+// Groups
+// ---------------------------------------------------------------------
+
+TableGroup keycloak_group [color: #64748b] {
+  keycloak.user_entity
+}
+
+TableGroup users_db_group [color: #3b82f6] {
+  users_db.users
+  users_db.user_blocks
+  users_db.legal_acceptances
+  users_db.categories
+  users_db.creators
+  users_db.creator_social_links
+  users_db.kyc_requests
+  users_db.admin_audit_log
+  users_db.outbox
+}
+
+TableGroup content_db_group [color: #10b981] {
+  content_db.creator_profiles
+  content_db.posts
+  content_db.post_media
+  content_db.comments
+  content_db.likes
+  content_db.moderation_cases
+  content_db.reports
+  content_db.access_grants
+  content_db.outbox
+}
+
+TableGroup media_db_group [color: #f59e0b] {
+  media_db.media
+  media_db.upload_parts
+  media_db.media_renditions
+  media_db.outbox
+}
+
+TableGroup payment_db_group [color: #ef4444] {
+  payment_db.platform_settings
+  payment_db.creator_accounts
+  payment_db.tiers
+  payment_db.creator_daily_stats
+  payment_db.saved_cards
+  payment_db.subscriptions
+  payment_db.payments
+  payment_db.donations
+  payment_db.ppv_purchases
+  payment_db.refunds
+  payment_db.payout_cards
+  payment_db.payouts
+  payment_db.ledger_entries
+  payment_db.webhook_events
+  payment_db.reconciliation_reports
+  payment_db.reconciliation_items
+  payment_db.outbox
+}
+
+TableGroup notify_db_group [color: #8b5cf6] {
+  notify_db.recipients
+  notify_db.devices
+  notify_db.notification_settings
+  notify_db.notification_templates
+  notify_db.notifications
+  notify_db.notification_deliveries
+}
+
+
+// ---------------------------------------------------------------------
+// Logical cross-database references (UUID only, NO foreign key).
+// Kept so dbdiagram draws the lines; do not create FKs from these.
+// ---------------------------------------------------------------------
+
+Ref: users_db.users.id - keycloak.user_entity.id
+Ref: content_db.creator_profiles.creator_id - users_db.creators.id
+Ref: payment_db.creator_accounts.creator_id - users_db.creators.id
+Ref: notify_db.recipients.user_id - users_db.users.id
+Ref: content_db.post_media.media_id > media_db.media.id
+Ref: media_db.media.owner_id > users_db.users.id
+Ref: payment_db.ppv_purchases.post_id > content_db.posts.id
+Ref: payment_db.payments.user_id > users_db.users.id
+Ref: payment_db.subscriptions.user_id > users_db.users.id
+Ref: content_db.comments.user_id > users_db.users.id
